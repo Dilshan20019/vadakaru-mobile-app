@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { Alert, Switch, Text, TouchableOpacity, View } from 'react-native';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { Redirect, useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Screen, Card, SectionTitle, Button, Muted, Row, Badge, Chip, ChipRow, money } from '../components/ui';
+import { Screen, Card, SectionTitle, Button, Muted, Row, Badge, Chip, ChipRow, Loading, money } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
 import { useLang } from '../context/LanguageContext';
 import api, { errMsg } from '../api/client';
@@ -10,13 +10,18 @@ import { colors } from '../theme';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, setUser, refresh, logout } = useAuth();
+  const { user, loading, setUser, refresh, logout } = useAuth();
   const { t, lang, setLang } = useLang();
-  const isWorker = user.role === 'worker';
+  const isWorker = user?.role === 'worker';
   const [busy, setBusy] = useState(false);
 
   // READ latest profile whenever the tab is focused
-  useFocusEffect(useCallback(() => { refresh().catch(() => {}); }, [refresh]));
+  useFocusEffect(useCallback(() => {
+    if (!loading && user) refresh().catch(() => {});
+  }, [loading, refresh, user]));
+
+  if (loading) return <Loading />;
+  if (!user) return <Redirect href="/Splash" />;
 
   // UPDATE availability toggle
   const toggleAvailable = async (v) => {

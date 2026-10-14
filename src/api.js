@@ -1,4 +1,4 @@
-import { API_URL } from './config';
+﻿import { API_URL } from './config';
 
 let token = null;
 export const setToken = (t) => { token = t; };
@@ -8,7 +8,7 @@ async function request(method, path, body) {
   try {
     res = await fetch(`${API_URL}${path}`, {
       method,
-      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch {

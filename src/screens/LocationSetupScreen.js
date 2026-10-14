@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Alert, Switch, Text, View } from 'react-native';
 import * as Location from 'expo-location';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Screen, Card, SectionTitle, Chip, ChipRow, Field, Button, Stepper, Muted, Row } from '../components/ui';
+import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
+import { Screen, Card, SectionTitle, Chip, ChipRow, Field, Button, Stepper, Muted, Row, Loading } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
 import api, { errMsg } from '../api/client';
 import { DISTRICTS, TRANSPORT } from '../constants';
@@ -14,17 +14,20 @@ export default function LocationSetupScreen() {
   const onboarding = Array.isArray(onboardingParam)
     ? onboardingParam.includes('true')
     : onboardingParam === 'true';
-  const { user, setUser } = useAuth();
+  const { user, loading, setUser } = useAuth();
 
-  const [district, setDistrict] = useState(user.homeDistrict);
-  const [radius, setRadius] = useState(user.travelRadius || 15);
-  const [transport, setTransport] = useState(user.transport || []);
-  const [stayOnSite, setStayOnSite] = useState(user.stayOnSite);
-  const [urgent, setUrgent] = useState(user.urgentAlerts);
-  const [coords, setCoords] = useState(user.location || null);
-  const [placeName, setPlaceName] = useState(user.nearestTown || '');
+  const [district, setDistrict] = useState(user?.homeDistrict || '');
+  const [radius, setRadius] = useState(user?.travelRadius || 15);
+  const [transport, setTransport] = useState(user?.transport || []);
+  const [stayOnSite, setStayOnSite] = useState(user?.stayOnSite || false);
+  const [urgent, setUrgent] = useState(user?.urgentAlerts || false);
+  const [coords, setCoords] = useState(user?.location || null);
+  const [placeName, setPlaceName] = useState(user?.nearestTown || '');
   const [newTown, setNewTown] = useState('');
   const [busy, setBusy] = useState(false);
+
+  if (loading) return <Loading />;
+  if (!user) return <Redirect href="/Splash" />;
 
   const toggleTransport = (t) => setTransport((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]));
 
