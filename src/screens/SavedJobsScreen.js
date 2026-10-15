@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Alert, FlatList, RefreshControl, Text } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useFocusEffect } from 'expo-router/react-navigation';
 import { Card, Muted, Empty, money } from '../components/ui';
 import JobCard from '../components/JobCard';
@@ -7,7 +8,8 @@ import { useJobActions } from '../hooks/useJobActions';
 import api, { errMsg } from '../api/client';
 import { colors } from '../theme';
 
-export default function SavedJobsScreen({ navigation }) {
+export default function SavedJobsScreen() {
+  const router = useRouter();
   const [jobs, setJobs] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -47,7 +49,7 @@ export default function SavedJobsScreen({ navigation }) {
       }
       ListEmptyComponent={<Empty text="No saved jobs yet. Tap the heart on any job to keep it here." />}
       renderItem={({ item: j }) => (
-        <JobCard job={j} onPress={() => navigation.navigate('JobDetail', { jobId: j._id })} onApply={apply} onToggleSave={toggleSave} applyLabel="Quick Apply" />
+        <JobCard job={j} onPress={() => router.push({ pathname: '/JobDetail', params: { jobId: j._id } })} onApply={apply} onToggleSave={toggleSave} applyLabel="Quick Apply" />
       )}
     />
   );
